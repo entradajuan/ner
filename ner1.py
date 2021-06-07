@@ -21,4 +21,29 @@ if gpus:
 !wget https://gmb.let.rug.nl/releases/gmb-2.2.0.zip
 !unzip gmb-2.2.0.zip
 
+import os
+ruta = './gmb-2.2.0/data/'
+fnames = []
+for root, dirs, files in os.walk(ruta):
+  for name in files:
+    if name.endswith(".tags"):
+            fnames.append(os.path.join(root, name))
 
+print(len(fnames))
+print(fnames[0])
+
+!mkdir ner
+
+import csv
+import collections
+ 
+ner_tags = collections.Counter()
+iob_tags = collections.Counter()
+
+
+total_sentences = 0
+outfiles = []
+for idx, file in enumerate(fnames):
+  print(idx, '  --  ', file)
+  with open(file, 'rb') as content:
+    data = content.read().decode('utf-8').strip()
