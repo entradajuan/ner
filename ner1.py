@@ -41,9 +41,34 @@ ner_tags = collections.Counter()
 iob_tags = collections.Counter()
 
 
+
 total_sentences = 0
 outfiles = []
 for idx, file in enumerate(fnames):
-  print(idx, '  --  ', file)
   with open(file, 'rb') as content:
     data = content.read().decode('utf-8').strip()
+    sentences = data.split("\n\n")
+    print(idx, '  --  ', file,'  --  ', len(sentences))
+    total_sentences += len(sentences)
+
+    with open("./ner/"+str(idx)+"-"+os.path.basename(file), 'w') as outfile:
+      outfiles.append("./ner/"+str(idx)+"-"+os.path.basename(file))
+      writer = csv.writer(outfile)
+      
+      for sentence in sentences:
+        tokens = sentence.split('\n')
+        words, pos, ner = [], [], []
+        
+        for tok in tokens:
+          t = tok.split('\t')
+          words.append(t[0])
+          pos.append(t[1])
+          ner_tags[t[3]] += 1
+#          ner.append(strip_ner_subcat(t[3])
+
+        writer.writerow([" ".join(words), " ".join(pos)])
+      print(idx, '  --  ', file,'  --  ', len(sentences))
+        
+
+
+
