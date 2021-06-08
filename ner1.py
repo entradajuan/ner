@@ -177,4 +177,60 @@ print(Y.shape)
 print(Y[0][0])
 print(y_pad[0][0])
 
+vocab_size = len(text_vocab) + 1
+embedding_dim = 64
+rnn_units = 100
+BATCH_SIZE = 90
+
+from tensorflow.keras.layers import Embedding, Bidirectional, LSTM, TimeDistributed, Dense
+
+dropout = 0.2
+def build_model(vocab_size, embedding_dim, rnn_units, dropout, batch_size, classes):
+  model = tf.keras.Sequential([Embedding(vocab_size, embedding_dim, mask_zero=True, batch_input_shape=[BATCH_SIZE, None] ),
+                               Bidirectional(LSTM(units=rnn_units, return_sequences=True, dropout=dropout, kernel_initializer=tf.keras.initializers.he_normal() )),
+                               TimeDistributed(Dense(rnn_units, activation= 'relu')),
+                               Dense(num_classes, activation='softmax')
+                               ])
+  return model
+
+model = build_model(vocab_size, embedding_dim, rnn_units, dropout, BATCH_SIZE, num_classes)
+print(model.summary())
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+X = x_pad
+total_sentences = Y.shape[0]
+test_size = round(total_sentences / BATCH_SIZE * 0.2)
+print(total_sentences)
+print(total_sentences / BATCH_SIZE * 0.2)
+print(test_size)
+
+X_train = X[BATCH_SIZE*test_size:]
+Y_train = Y[BATCH_SIZE*test_size:]
+
+X_test = X[0:BATCH_SIZE*test_size]
+Y_test = Y[0:BATCH_SIZE*test_size]
+
+print(X_train.shape)
+print(X_test.shape)
+print(X_train.shape[0] + X_test.shape[0])
+
+model.fit(X_train, Y_train, batch_size=BATCH_SIZE, epochs=15)
+
+model.evaluate(X_test, Y_test, batch_size=BATCH_SIZE)
+
+y_predict = model.predict(X_test, batch_size=BATCH_SIZE)
+print(type(y_predict))
+
+print(y_predict[0])
+
+print(text_tok.sequences_to_texts([X_test[0]]))
+print(text_tok.sequences_to_texts([x_pad[0]]))
+print(ner_tok.sequences_to_texts([y_pad[0]]))
+
+y_pred = tf.argmax(y_predict, -1)
+print(type(y_pred))
+print(y_pred)
+
+y_pnp = y_pred.numpy()
+ner_tok.sequences_to_texts([y_pnp[0]])
 
