@@ -32,6 +32,7 @@ for root, dirs, files in os.walk(ruta):
 print(len(fnames))
 print(fnames[0])
 
+!rm -r ner
 !mkdir ner
 
 import csv
@@ -40,7 +41,21 @@ import collections
 ner_tags = collections.Counter()
 iob_tags = collections.Counter()
 
+def strip_ner_subcat(tag):
+  return tag.split('-')[0]
 
+def iob (ner_list):
+  iob_tokens = []
+  for idx, token in enumerate(ner_list):
+    iob_tags[token] += 1
+    if (idx == 0):
+      iob_tokens.append("B-" + token)
+    elif (ner_list[idx-1] == token):
+      iob_tokens.append("I-" + token)
+    else:
+      iob_tokens.append("B-" + token)
+
+  return iob_tokens
 
 total_sentences = 0
 outfiles = []
@@ -64,11 +79,8 @@ for idx, file in enumerate(fnames):
           words.append(t[0])
           pos.append(t[1])
           ner_tags[t[3]] += 1
-#          ner.append(strip_ner_subcat(t[3])
+          ner.append(strip_ner_subcat(t[3]))
 
-        writer.writerow([" ".join(words), " ".join(pos)])
-      print(idx, '  --  ', file,'  --  ', len(sentences))
-        
-
-
-
+        writer.writerow([" ".join(words),  " ".join(iob(ner)), " ".join(pos)])
+      
+      
