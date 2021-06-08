@@ -47,13 +47,19 @@ def strip_ner_subcat(tag):
 def iob (ner_list):
   iob_tokens = []
   for idx, token in enumerate(ner_list):
-    iob_tags[token] += 1
-    if (idx == 0):
-      iob_tokens.append("B-" + token)
-    elif (ner_list[idx-1] == token):
-      iob_tokens.append("I-" + token)
+    if (token != 'O'):
+      if (idx == 0):
+        iob_tokens.append("B-" + token)
+        iob_tags["B-" + token] += 1
+      elif (ner_list[idx-1] == token):
+        iob_tokens.append("I-" + token)
+        iob_tags["I-" + token] += 1
+      else:
+        iob_tokens.append("B-" + token)
+        iob_tags["B-" + token] += 1
     else:
-      iob_tokens.append("B-" + token)
+      iob_tokens.append(token)
+      iob_tags[token] += 1  
 
   return iob_tokens
 
@@ -83,4 +89,26 @@ for idx, file in enumerate(fnames):
 
         writer.writerow([" ".join(words),  " ".join(iob(ner)), " ".join(pos)])
       
-      
+print(total_sentences)
+
+print(ner_tags)
+print(len(ner_tags))
+
+print(iob_tags)
+print(len(iob_tags))
+
+print(*iob_tags)
+print(*iob_tags.items())
+
+import matplotlib.pyplot as plt
+labels , values = zip(*iob_tags.items())
+
+print(labels)
+indexes = np.arange(len(labels))
+
+plt.bar(indexes, values)
+plt.xticks(indexes, labels, rotation='vertical')
+plt.margins(0.01)
+plt.subplots_adjust(bottom=0.15)
+plt.show()
+
