@@ -112,3 +112,69 @@ plt.margins(0.01)
 plt.subplots_adjust(bottom=0.15)
 plt.show()
 
+import glob
+import pandas as pd
+from tensorflow.keras.preprocessing.text import Tokenizer
+
+files = glob.glob("./ner/*.tags")
+
+dfs = [pd.read_csv(f, header=None, names=['text', 'label', 'pos']) for f in files] 
+df = pd.concat(dfs, ignore_index= True )
+print(df.head())
+print(df.isna().sum())
+print(df.describe())
+print(df.info())
+
+text_tok = Tokenizer(filters= '[\\^\t\n]', lower=False, split=' ', oov_token='<OOV>')
+pos_tok = Tokenizer(filters= '\t\n', lower=False, split=' ', oov_token='<OOV>')
+ner_tok = Tokenizer(filters= '\t\n', lower=False, split=' ', oov_token='<OOV>')
+
+text_tok.fit_on_texts(df['text'])
+pos_tok.fit_on_texts(df['pos'])
+ner_tok.fit_on_texts(df['label'])
+
+text_config = text_tok.get_config()
+ner_config = ner_tok.get_config()
+
+print(text_config['document_count'])
+print(ner_config)
+
+text_vocab = eval(text_config['index_word'])
+ner_vocab = eval(ner_config['index_word'])
+
+print(len(text_vocab))
+print(len(ner_vocab))
+
+x_tok = text_tok.texts_to_sequences(df['text'])
+y_tok = ner_tok.texts_to_sequences(df['label'])
+
+print(type(y_tok))
+print(x_tok[0])
+print(y_tok[0])
+
+print(text_tok.sequences_to_texts([x_tok[0]]), df['text'][0])
+print(ner_tok.sequences_to_texts([y_tok[0]]), df['label'][0])
+
+from tensorflow.keras.preprocessing import sequence
+
+max_len = 100
+x_pad = sequence.pad_sequences(x_tok, padding='post', maxlen=max_len)
+y_pad = sequence.pad_sequences(y_tok, padding='post', maxlen=max_len)
+
+print(type(x_pad))
+print(x_pad.shape)
+print(y_pad.shape)
+
+print(text_tok.sequences_to_texts([x_pad[0]]))
+print(ner_tok.sequences_to_texts([y_pad[0]]))
+
+num_classes =len(ner_vocab) + 1
+print(num_classes)
+
+Y = tf.keras.utils.to_categorical(y_pad, num_classes=num_classes)
+print(type(Y))
+print(Y.shape)
+print(Y[0][0])
+print(y_pad[0][0])
+
+
