@@ -133,6 +133,13 @@ text_tok.fit_on_texts(df['text'])
 pos_tok.fit_on_texts(df['pos'])
 ner_tok.fit_on_texts(df['label'])
 
+import pickle
+
+# saving
+with open('tokenizer.pickle', 'wb') as handle:
+    pickle.dump(text_tok, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
 text_config = text_tok.get_config()
 ner_config = ner_tok.get_config()
 
@@ -187,7 +194,8 @@ from tensorflow.keras.layers import Embedding, Bidirectional, LSTM, TimeDistribu
 
 dropout = 0.2
 def build_model(vocab_size, embedding_dim, rnn_units, dropout, batch_size, classes):
-  model = tf.keras.Sequential([Embedding(vocab_size, embedding_dim, mask_zero=True, batch_input_shape=[BATCH_SIZE, None] ),
+  model = tf.keras.Sequential([#Embedding(vocab_size, embedding_dim, mask_zero=True, batch_input_shape=[BATCH_SIZE, None] ),
+                               Embedding(vocab_size, embedding_dim, mask_zero=True, input_length=max_len ),
                                Bidirectional(LSTM(units=rnn_units, return_sequences=True, dropout=dropout, kernel_initializer=tf.keras.initializers.he_normal() )),
                                TimeDistributed(Dense(rnn_units, activation= 'relu')),
                                Dense(num_classes, activation='softmax')
@@ -236,5 +244,25 @@ print(y_pred)
 
 y_pnp = y_pred.numpy()
 ner_tok.sequences_to_texts([y_pnp[0]])
+
+
+#________________________________-
+
+text = ['Rachel Maddow Strikes Multi-Year Deal With MSNBC']
+
+sentence = text_tok.texts_to_sequences(text)
+sentence = sequence.pad_sequences(sentence, padding='post', maxlen=max_len)
+
+
+y_predict = model.predict(sentence)
+print(type(y_predict))
+
+y_pred = tf.argmax(y_predict, -1)
+print(type(y_pred))
+print(y_pred)
+y_pnp = y_pred.numpy()
+ner_tok.sequences_to_texts([y_pnp[0]])
+
+
 
 
