@@ -236,3 +236,4 @@ print(y_pred)
 y_pnp = y_pred.numpy()
 ner_tok.sequences_to_texts([y_pnp[0]])
 
+
