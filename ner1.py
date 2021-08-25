@@ -145,6 +145,7 @@ ner_vocab = eval(ner_config['index_word'])
 print(len(text_vocab))
 print(len(ner_vocab))
 
+
 x_tok = text_tok.texts_to_sequences(df['text'])
 y_tok = ner_tok.texts_to_sequences(df['label'])
 

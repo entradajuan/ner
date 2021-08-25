@@ -8,7 +8,8 @@ model2 = tf.keras.models.load_model('path_to_my_model.h5')
 print(model2.summary())
 
 # LOAD TOKENIZER
-text_tok = Tokenizer.load_model()
+with open('tokenizer.pickle', 'rb') as handle:
+    text_tok = pickle.load(handle)
 
 text = ['Rachel Maddow Strikes Multi-Year Deal With MSNBC']
 
