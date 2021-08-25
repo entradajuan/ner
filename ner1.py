@@ -218,6 +218,8 @@ model.fit(X_train, Y_train, batch_size=BATCH_SIZE, epochs=15)
 
 model.evaluate(X_test, Y_test, batch_size=BATCH_SIZE)
 
+model.save('path_to_my_model.h5')
+
 y_predict = model.predict(X_test, batch_size=BATCH_SIZE)
 print(type(y_predict))
 
