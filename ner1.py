@@ -135,10 +135,11 @@ ner_tok.fit_on_texts(df['label'])
 
 import pickle
 
-# saving
 with open('tokenizer.pickle', 'wb') as handle:
     pickle.dump(text_tok, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+with open('ner_tokenizer.pickle', 'wb') as handle:
+    pickle.dump(ner_tok, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 text_config = text_tok.get_config()
 ner_config = ner_tok.get_config()

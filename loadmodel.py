@@ -11,6 +11,9 @@ print(model2.summary())
 with open('tokenizer.pickle', 'rb') as handle:
     text_tok = pickle.load(handle)
 
+with open('ner_tokenizer.pickle', 'rb') as handle:
+    ner_tok = pickle.load(handle)
+
 text = ['Juani Lopez goes tomorrow to Bosnia']
 
 max_len = 100
